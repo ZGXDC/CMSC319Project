@@ -11,14 +11,13 @@ load_dotenv()
 #userMood will be the user's desired mood for the playlist
 userMood = ''
 
-#Dictionary that maps "generic moods" to the specific audio features of Spotify's Data
-# - Spotify doesn't understand "Happy", but the data has specific numerical values to describe the audio
-# - The dictionary then maps the human moods with Spotify's audio features
-
 #METHODS
 #Method that returns specific audioFeatures of each human mood. 
 # - Parameters are the "mood" - the user input mood and "neededData" - which key value is needed
 # - "neededData" can only be "seed_genres", "target_valence", or "target_energy"
+   # MoodFeatures Dictionary maps "generic moods" to the specific audio features of Spotify's Data
+    # - Spotify doesn't understand "Happy", but the data has specific numerical values to describe the audio
+    # - The dictionary then maps the human moods with Spotify's audio features
 def getMoodFeaturesData(mood, neededData):
     moodFeatures = {
     "happy": {
@@ -68,8 +67,8 @@ def getMoodFeaturesData(mood, neededData):
         return specificMood[neededData][0]
 
 #Method to get Authorization Token
-#-----Token acts as a pass to talk to Spotify Servers
-#-----Spotify won't give data without having a valid token
+# - Token acts as a pass to talk to Spotify Servers
+# - Spotify won't give data without having a valid token
 def getToken():
     client_id = os.getenv("CLIENT_ID")
     client_secret = os.getenv("CLIENT_SECRET")
@@ -94,6 +93,7 @@ def getToken():
     token_info = r.json()
     return token_info["access_token"]
 
+#Queries Spotify API for songs based on genre of user-input mood
 def searchTracks(genre, token, limit=10):
     url = "https://api.spotify.com/v1/search"
     headers = {"Authorization": f"Bearer {token}"}
@@ -105,9 +105,6 @@ def searchTracks(genre, token, limit=10):
     }
 
     r = requests.get(url, headers=headers, params=params)
-
-    print("Status Code:", r.status_code)
-    print("Request URL:", r.url)
 
     try:
         data = r.json()
@@ -123,15 +120,20 @@ def searchTracks(genre, token, limit=10):
         print("Raw Response:", r.text)
         return []
   
+
 #MAIN  
 accessToken = getToken()
+print("Welcome to Spotify Playlist Generator!")
+print("Please select a mood (input the number, without a period) for your playlist from the following list:\n")
+print("1. happy\n2. sad\n3. chill\n4. energetic\n5. dramatic\n6. romantic\n7. focus")
 
 
-userMood = "romantic"
+userMood = int(input())
 genre = getMoodFeaturesData(userMood, "seed_genres")
 
 tracks = searchTracks(genre, accessToken , limit=5)
-print("\nTop tracks:")
-for t in tracks:
-    print(t)
+
+# print("\nTop tracks:")
+# for t in tracks:
+#     print(t)
     
