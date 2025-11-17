@@ -14,7 +14,13 @@ userMood = ''
 #Dictionary that maps "generic moods" to the specific audio features of Spotify's Data
 # - Spotify doesn't understand "Happy", but the data has specific numerical values to describe the audio
 # - The dictionary then maps the human moods with Spotify's audio features
-moodFeatures = {
+
+#METHODS
+#Method that returns specific audioFeatures of each human mood. 
+# - Parameters are the "mood" - the user input mood and "neededData" - which key value is needed
+# - "neededData" can only be "seed_genres", "target_valence", or "target_energy"
+def getMoodFeaturesData(mood, neededData):
+    moodFeatures = {
     "happy": {
         "target_valence": 0.9,
         "target_energy": 0.8,
@@ -46,7 +52,7 @@ moodFeatures = {
         "target_valence": 0.7,
         "target_energy": 0.4,
         "target_acousticness": 0.6,
-        "seed_genres": ["acoustic"]
+        "seed_genres": ["r-n-b"]
     },
     "focus": {
         "target_valence": 0.4,
@@ -54,9 +60,12 @@ moodFeatures = {
         "target_instrumentalness": 0.8,
         "seed_genres": ["ambient"]
     }
-}
-
-#METHODS
+    }
+    specificMood = moodFeatures[mood]
+    if neededData!="seed_genres":
+        return specificMood[neededData]
+    else:
+        return specificMood[neededData][0]
 
 #Method to get Authorization Token
 #-----Token acts as a pass to talk to Spotify Servers
@@ -113,12 +122,16 @@ def searchTracks(genre, token, limit=10):
         print("Error decoding JSON:", e)
         print("Raw Response:", r.text)
         return []
-    
+  
+#MAIN  
 accessToken = getToken()
-userMood = "energetic"
-specificMood = moodFeatures[userMood]
-genre = specificMood["seed_genres"]
+
+
+userMood = "romantic"
+genre = getMoodFeaturesData(userMood, "seed_genres")
+
 tracks = searchTracks(genre, accessToken , limit=5)
 print("\nTop tracks:")
 for t in tracks:
     print(t)
+    
